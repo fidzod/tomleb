@@ -12,7 +12,7 @@
 	let updateAvatar = async () => {
 		const file = avatarFileInput.files?.[0];
 		if (!file) return;
-		await api.updateAvatar(file);
+		await api.updateUser({avatar: file});
 		avatarCacheKey = Date.now();
 		await invalidateAll();
 	};

@@ -11,7 +11,7 @@
 	let updateBanner = async () => {
 		const file = bannerFileInput.files?.[0];
 		if (!file) return;
-		await api.updateBanner(file);
+		await api.updateProfile({banner: file});
 		bannerCacheKey = Date.now();
 		await invalidateAll();
 	};

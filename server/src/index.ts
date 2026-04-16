@@ -6,6 +6,7 @@ import { requireAuth } from "./middleware";
 import authRoutes from "./routes/auth.routes.ts";
 import postsRoutes from "./routes/posts.routes.ts";
 import profileRoutes from "./routes/profile.routes.ts";
+import userRoutes from "./routes/user.routes.ts";
 
 const app = new Hono();
 
@@ -23,6 +24,7 @@ app.use("/uploads/*", serveStatic({ root: "./" }));
 app.route("/auth", authRoutes);
 app.route("/posts", postsRoutes);
 app.route("/profile", profileRoutes);
+app.route("/user", userRoutes);
 
 /* TODO: remove (replaced by: users/loggedIn) */
 app.get("/getuser", requireAuth, (c: Context) => {

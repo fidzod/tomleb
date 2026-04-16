@@ -3,7 +3,10 @@ import type { Post, UserProfile } from '$lib/types';
 
 const BASE_URL = typeof window === 'undefined' ? 'http://localhost:3000' : '/api';
 
-const apiCall = async (path: string, options: RequestInit = {}): Promise<Response> =>
+const apiCall = async (
+    path: string,
+    options: RequestInit = {}
+): Promise<Response> =>
     fetch(`${BASE_URL}${path}`, {
         ...options,
         credentials: 'include',
@@ -12,6 +15,17 @@ const apiCall = async (path: string, options: RequestInit = {}): Promise<Respons
             ...options.headers
         }
     });
+
+const genericUpdate = async <T extends Record<string, any>>(
+    endpoint: string,
+    updates: Partial<T>
+) => {
+    const formData = new FormData();
+    Object.entries(updates).forEach(([field, value]) => {
+        formData.append(field, value);
+    });
+    await apiCall(endpoint, { method: "PATCH", body: formData });
+};
 
 export const api = {
     me: async (cookie: string | null) => {
@@ -87,31 +101,15 @@ export const api = {
         };
     },
 
-    updateBanner: async (file: File) => {
-        const formData = new FormData();
-        formData.append("banner", file);
+    updateUser: async (updates: Partial<{
+        username: string,
+        displayName: string,
+        avatar: File
+    }>) => genericUpdate('/user', updates),
 
-        await apiCall('/profile/upload-banner', {
-            method: "POST",
-            body: formData,
-        });
-    },
-
-    updateAvatar: async (file: File) => {
-        const formData = new FormData();
-        formData.append("avatar", file);
-
-        await apiCall('/profile/upload-avatar', {
-            method: "POST",
-            body: formData,
-        });
-    },
-
-    updateProfile: async (updates: {
-        profileBio: string | undefined, profileLocation: string | undefined
-    }) =>
-        await apiCall('/profile/update', {
-            method: 'POST',
-            body: JSON.stringify(updates)
-        }),
+    updateProfile: async (updates: Partial<{
+        username: string,
+        displayName: string,
+        avatar: File
+    }>) => genericUpdate('/profile', updates),
 };
