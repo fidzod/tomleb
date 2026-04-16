@@ -3,7 +3,6 @@
 ## Backlog
 ### Feature
 - [ ] (#04) Comments
-- [ ] (#10) Likes
 - [ ] (#11) Re-sharing
 - [ ] (#05) Long form posts
 
@@ -13,12 +12,14 @@
 
 ### Refactor
 - [ ] (#07, #client) Current user is not typed
-- [ ] (#09, #server) The way a userId is resolved could be cleaned up
 
 ## In Progress
+### Feature
+- [ ] (#10) Likes
 
 ## Done
 ### Refactor
+- [x] (#09, #server) The way a userId is resolved could be cleaned up
 - [x] (#03, #server) updateBanner should be integrated into /update 
     - Likewise /updateAvatar should be a part of a /updateUser
 - [x] (#02, #server) loggedIn route should really be called /me

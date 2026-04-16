@@ -42,42 +42,23 @@ postsRoutes.post("/", requireAuth, async (c) => {
     return c.json({ post });
 });
 
-const resolveUserId = (userId: number) => {
-    const user = db.select().from(users).where(eq(users.id, userId)).get();
-
-    if (!user) return null;
-
-    return {
-        id: user.id,
-        username: user.username,
-        displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
-    };
-};
-
-const idFromUsername = (username: string) => {
-    const user = db.select().from(users).where(eq(users.username, username)).get();
-    return user ? user.id : null;
-}
-
 postsRoutes.get("/", async (c) => {
-    let allPosts, user;
+    const username = c.req.query('user');
+    let allPosts;
 
-    if (user = c.req.query('user')) {
-        const userid = idFromUsername(user)
-
-        if (!userid) return c.json({message: "User does not exist."}, 404);
-
+    if (username) {
         allPosts = await db
             .select()
             .from(posts)
-            .where(eq(posts.userId, userid))
-            .leftJoin(postMedia, eq(posts.id, postMedia.postId));
+            .leftJoin(postMedia, eq(posts.id, postMedia.postId))
+            .innerJoin(users, eq(posts.userId, users.id))
+            .where(eq(users.username, username));
     } else {
         allPosts = await db
             .select()
             .from(posts)
-            .leftJoin(postMedia, eq(posts.id, postMedia.postId));
+            .leftJoin(postMedia, eq(posts.id, postMedia.postId))
+            .innerJoin(users, eq(posts.userId, users.id));
     }
 
     const grouped = allPosts.reduce((acc, row) => {
@@ -88,7 +69,12 @@ postsRoutes.get("/", async (c) => {
         } else {
             acc.push({
                 id: row.posts.id,
-                user: resolveUserId(row.posts.userId),
+                user: {
+                    id: row.users.id,
+                    username: row.users.username,
+                    displayName: row.users.displayName,
+                    avatarUrl: row.users.avatarUrl,
+                },
                 content: row.posts.content,
                 postedAt: row.posts.postedAt,
                 media: row.post_media ? [row.post_media.url] : [],
