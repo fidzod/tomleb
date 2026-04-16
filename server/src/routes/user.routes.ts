@@ -1,12 +1,14 @@
 import { Hono, Context } from "hono";
 
+import type { Variables } from "../types";
+
 import { db } from "../db";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 import { requireAuth } from "../middleware";
 
-const userRoutes = new Hono();
+const userRoutes = new Hono<{ Variables: Variables }>();
 
 userRoutes.patch("/", requireAuth, async (c: Context) => {
     const user = c.get("user");

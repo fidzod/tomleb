@@ -2,6 +2,8 @@ import { Hono, Context } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
 
+import type { Variables } from "../types";
+
 import { db } from "../db";
 import { users, userProfiles } from "../db/schema";
 import { requireAuth } from "../middleware";
@@ -13,7 +15,7 @@ import {
     invalidateSession,
 } from "../auth";
 
-const authRoutes = new Hono();
+const authRoutes = new Hono<{ Variables: Variables }>();
 
 authRoutes.post("/register", async (c) => {
     const { email, password, username, displayName } = await c.req.json();

@@ -1,6 +1,25 @@
 <script lang="ts">
+    import { api } from '$lib/api.ts';
+
 	import Gallery from '$lib/components/Gallery.svelte';
+
+	import { setLucideProps } from '@lucide/svelte';
+	import { HeartIcon, RepeatIcon, MessageCircleIcon, EyeIcon } from '@lucide/svelte/icons';
+
+	setLucideProps({ size: 16 });
+
 	let { post } = $props();
+
+	let likedByMe = $state(post.likedByMe);
+	let likeCount = $state(post.likeCount);
+
+	const likeButtonClick = async () => {
+        const res = !likedByMe
+            ? await api.addLike(post.id)
+            : await api.deleteLike(post.id);
+        likedByMe = res.likedByMe !== undefined ? res.likedByMe : likedByMe;
+        likeCount = res.likeCount !== undefined ? res.likeCount : likeCount;
+    };
 </script>
 
 <div class="post">
@@ -10,10 +29,10 @@
 		</a>
 		<div class="details">
 			<div class="row">
-                <a href="/profile/{post.user.username}">
-                    <span class="display-name">{post.user.displayName}</span>
-                    <span class="username">@{post.user.username}</span>
-                </a>
+				<a href="/profile/{post.user.username}">
+					<span class="display-name">{post.user.displayName}</span>
+					<span class="username">@{post.user.username}</span>
+				</a>
 			</div>
 			<span class="posted-time">{post.timeAgo}</span>
 		</div>
@@ -29,9 +48,22 @@
 		{/if}
 		<span class="content">{post.content}</span>
 	</div>
+
+	<div class="post-interactions">
+		<button id="like-btn" class:liked={likedByMe} onclick={likeButtonClick}
+			><HeartIcon /> {likeCount}</button
+		>
+		<button id="inter-repost"><RepeatIcon /></button>
+		<button id="inter-comments"><MessageCircleIcon /></button>
+		<button id="inter-views"><EyeIcon /></button>
+	</div>
 </div>
 
 <style>
+	:root {
+		--like-btn-pink: #f383b7;
+	}
+
 	.post {
 		width: 100%;
 		padding: 9px 16px 16px;
@@ -59,9 +91,9 @@
 		border-radius: 50%;
 		object-fit: cover;
 	}
-    a:has(.avatar) {
-        margin-top: 7px;
-    }
+	a:has(.avatar) {
+		margin-top: 7px;
+	}
 	.posted-time,
 	.username {
 		font-size: 0.8em;
@@ -75,5 +107,36 @@
 
 	:global(.hasContent .gallery) {
 		margin-bottom: 12px;
+	}
+
+	.post-interactions {
+		display: flex;
+		gap: 18px;
+	}
+
+	.post-interactions button {
+		background: none;
+		border: none;
+		padding: 2px;
+		display: flex;
+		align-items: center;
+        box-shadow: none;
+	}
+
+	#like-btn:hover {
+		color: var(--like-btn-pink);
+	}
+
+	#like-btn.liked {
+		color: var(--like-btn-pink);
+		:global(.lucide) {
+			fill: var(--like-btn-pink);
+		}
+
+		&:hover {
+			:global(.lucide) {
+				fill: none;
+			}
+		}
 	}
 </style>

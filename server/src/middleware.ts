@@ -12,3 +12,12 @@ export const requireAuth = createMiddleware(async (c, next) => {
   c.set("user", user);
   await next();
 });
+
+export const optionalAuth = createMiddleware(async (c, next) => {
+  const token = getCookie(c, "session");
+  if (token) {
+      const user = await validateSession(token);
+      c.set("user", user);
+  }
+  await next();
+});

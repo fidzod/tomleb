@@ -13,8 +13,8 @@ const app = new Hono();
 app.use(
   cors({
     origin: "http://localhost:5173",
-    allowMethods: ["GET", "POST", "PUT", "DELETE"],
-    allowHeaders: ["Content-Type"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Cookie"],
     credentials: true,
   }),
 );
@@ -25,19 +25,6 @@ app.route("/auth", authRoutes);
 app.route("/posts", postsRoutes);
 app.route("/profile", profileRoutes);
 app.route("/user", userRoutes);
-
-/* TODO: remove (replaced by: users/loggedIn) */
-app.get("/getuser", requireAuth, (c: Context) => {
-  const user = c.get("user");
-  return c.json({
-    user: {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      displayName: user.displayName,
-    },
-  });
-});
 
 export default {
   port: 3000,

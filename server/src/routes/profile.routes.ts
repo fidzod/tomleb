@@ -1,12 +1,14 @@
 import { Hono, Context } from "hono";
 
+import type { Variables } from "../types";
+
 import { db } from "../db";
 import { userProfiles, users } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 import { requireAuth } from "../middleware";
 
-const profileRoutes = new Hono();
+const profileRoutes = new Hono<{ Variables: Variables }>();
 
 profileRoutes.get("/:username", (c: Context) => {
     const username = c.req.param("username");

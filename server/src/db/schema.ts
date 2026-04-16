@@ -44,3 +44,8 @@ export const postMedia = sqliteTable("post_media", {
         .references(() => posts.id),
     url: text("url").notNull(),
 });
+
+export const postLikes = sqliteTable("post_likes", {
+    userId: integer('user_id').notNull().references(() => users.id),
+    postId: integer('post_id').notNull().references(() => posts.id),
+});

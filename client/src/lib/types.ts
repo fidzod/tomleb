@@ -11,6 +11,8 @@ export interface Post {
 	media: string[];
 	timeAgo: string;
 	user: User;
+    likes: number;
+    likedByMe: boolean;
 }
 
 export interface UserProfile {

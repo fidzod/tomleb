@@ -112,4 +112,20 @@ export const api = {
         displayName: string,
         avatar: File
     }>) => genericUpdate('/profile', updates),
+
+    addLike: async (postId: number): Promise<{
+        likeCount: number,
+        likedByMe: boolean
+    }> => {
+        const res = await apiCall(`/posts/${postId}/like`, { method: 'POST' });
+        return await res.json();
+    },
+
+    deleteLike: async (postId: number): Promise<{
+        likeCount: number,
+        likedByMe: boolean
+    }> => {
+        const res = await apiCall(`/posts/${postId}/like`, { method: 'DELETE' });
+        return await res.json();
+    },
 };
