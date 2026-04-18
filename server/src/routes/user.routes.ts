@@ -38,7 +38,7 @@ userRoutes.patch("/", requireAuth, async (c: Context) => {
         })
         .where(eq(users.id, user.id));
 
-    return c.json({ message: 'success' });
+    return c.json({ message: "success" });
 });
 
 export default userRoutes;

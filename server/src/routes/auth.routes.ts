@@ -20,7 +20,11 @@ const authRoutes = new Hono<{ Variables: Variables }>();
 authRoutes.post("/register", async (c) => {
     const { email, password, username, displayName } = await c.req.json();
 
-    const existing = db.select().from(users).where(eq(users.email, email)).get();
+    const existing = db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .get();
     if (existing) return c.json({ error: "Email already in use" }, 400);
 
     const usernameTaken = db
@@ -36,14 +40,12 @@ authRoutes.post("/register", async (c) => {
         .values({ email, passwordHash, username, displayName })
         .returning();
 
-    await db
-        .insert(userProfiles)
-        .values({
-            userId: user.id,
-            bio: null,
-            location: null,
-            bannerUrl: null
-        });
+    await db.insert(userProfiles).values({
+        userId: user.id,
+        bio: null,
+        location: null,
+        bannerUrl: null,
+    });
 
     const token = await createSession(user.id);
     setCookie(c, "session", token, {
@@ -52,7 +54,7 @@ authRoutes.post("/register", async (c) => {
         maxAge: 60 * 60 * 24 * 30,
     });
 
-    return c.json({ message: 'success', user });
+    return c.json({ message: "success", user });
 });
 
 authRoutes.post("/login", async (c) => {
@@ -71,7 +73,7 @@ authRoutes.post("/login", async (c) => {
         maxAge: 60 * 60 * 24 * 30,
     });
 
-    return c.json({ message: 'success', user });
+    return c.json({ message: "success", user });
 });
 
 authRoutes.post("/logout", async (c) => {
@@ -81,10 +83,9 @@ authRoutes.post("/logout", async (c) => {
     return c.json({ success: true });
 });
 
-
 authRoutes.get("/me", requireAuth, (c: Context) => {
     const user = c.get("user");
-    return c.json({ message: 'success', user });
+    return c.json({ message: "success", user });
 });
 
 export default authRoutes;

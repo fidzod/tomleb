@@ -46,6 +46,24 @@ export const postMedia = sqliteTable("post_media", {
 });
 
 export const postLikes = sqliteTable("post_likes", {
-    userId: integer('user_id').notNull().references(() => users.id),
-    postId: integer('post_id').notNull().references(() => posts.id),
+    userId: integer("user_id")
+        .notNull()
+        .references(() => users.id),
+    postId: integer("post_id")
+        .notNull()
+        .references(() => posts.id),
+});
+
+export const comments = sqliteTable("comments", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    postId: integer("post_id")
+        .notNull()
+        .references(() => posts.id),
+    userId: integer("user_id")
+        .notNull()
+        .references(() => users.id),
+    parentId: integer("parent_id"),
+    replyingTo: integer("replying_to").references(() => users.id),
+    content: text("content"),
+    createdAt: integer("created_at").notNull(),
 });

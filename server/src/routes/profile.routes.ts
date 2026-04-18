@@ -30,7 +30,7 @@ profileRoutes.get("/:username", (c: Context) => {
         profile: {
             ...profile.users,
             ...profileWithoutId,
-        }
+        },
     });
 });
 
@@ -62,7 +62,7 @@ profileRoutes.patch("/", requireAuth, async (c: Context) => {
         })
         .where(eq(userProfiles.userId, user.id));
 
-    return c.json({ message: 'success' });
+    return c.json({ message: "success" });
 });
 
 export default profileRoutes;
