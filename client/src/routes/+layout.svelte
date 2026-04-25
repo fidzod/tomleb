@@ -19,7 +19,7 @@
 {/if}
 
 <div class="nav-mobile"><NavMobileTop /></div>
-<div class="nav-mobile"><NavMobileBtm /></div>
+<div class="nav-mobile"><NavMobileBtm user={data.user}/></div>
 
 <div class="container">
 	<div class="nav-desktop">

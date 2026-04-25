@@ -32,7 +32,10 @@ export const api = {
         if (res.status === 401) return null;
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         const data = await res.json();
-        return data.user;
+        return {
+            ...data.user,
+            avatarUrl: data.user.avatarUrl ? `${BASE_URL}${data.user.avatarUrl}` : null
+        };
     },
 
     login: async (email: string, password: string) => {

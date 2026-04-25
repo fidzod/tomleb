@@ -16,9 +16,6 @@
 - [ ] (#07, #client) Current user is not typed
 
 ## In Progress
-### Fix
-- [ ] (#06, #client, !) Mobile nav incomplete
-
 ### Feature
 - [ ] (#11) Re-sharing
 
@@ -26,6 +23,9 @@
 ### Feature 
 - [x] (#04) Comments
 - [x] (#10) Likes
+
+### Fix
+- [x] (#06, #client, !) Mobile nav incomplete
 
 ### Refactor
 - [x] (#12, #server, !) Server is missing types (e.g. for user)

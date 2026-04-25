@@ -1,5 +1,9 @@
+<script lang="ts">
+	import { ui } from '$lib/state/ui.svelte.ts';
+</script>
+
 <div class="mobile-nav-top nav-mobile">
-	<span class="highlight title">tomleb</span>
+	<span class="highlight title">{ ui.pageName || "tomleb" }</span>
 </div>
 
 <style>

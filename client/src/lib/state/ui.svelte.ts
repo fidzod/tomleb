@@ -1,5 +1,6 @@
 let loginModalOpen = $state(false);
 let newPostOpen = $state(false);
+let pageName = $state('');
 
 export const ui = {
 	get loginModalOpen() {
@@ -13,5 +14,11 @@ export const ui = {
 	},
 	set newPostOpen(v) {
 		newPostOpen = v;
-	}
+	},
+    get pageName() {
+        return pageName;
+    },
+    set pageName(v) {
+        pageName = v;
+    }
 };

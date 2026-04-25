@@ -5,8 +5,12 @@
 	import Banner from '$lib/components/profile/Banner.svelte';
 
 	import { MapPinIcon } from '@lucide/svelte/icons';
+	import { ui } from '$lib/state/ui.svelte.js';
 
 	let { data } = $props();
+
+    ui.pageName = data.ownsProfile ? "Your Profile" : `${data.profile.displayName}'s Profile`;
+
 </script>
 
 <Banner isOwner={data.ownsProfile} bannerUrl={data.profile.bannerUrl} />

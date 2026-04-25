@@ -2,11 +2,14 @@
 	import Post from '$lib/components/Post.svelte';
 	import Comment from '$lib/components/Comment.svelte';
 	import CommentForm from '$lib/components/CommentForm.svelte';
+	import { ui } from '$lib/state/ui.svelte.js';
 
 	let { data } = $props();
 
 	let post = $derived(data.post);
 	let comments = $derived(data.comments);
+
+    ui.pageName = "Comments";
 </script>
 
 <Post {post} openBottom={true} />
