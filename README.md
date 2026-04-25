@@ -2,6 +2,12 @@
 
 A full-stack social platform built with modern web technologies.
 
+<p>
+  <img src="screenshots/home-mobile.jpg" width="22%" />
+  &nbsp;&nbsp;
+  <img src="screenshots/profile-mobile.jpg" width="22%" />
+</p>
+
 ## Tech Stack
 
 **Frontend:** SvelteKit, Svelte 5, TypeScript
