@@ -11,7 +11,9 @@
     },
     "scripts": {
         "dev": "bun --watch src/index.ts",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "drizzle-generate": "bunx drizzle-kit generate",
+        "drizzle-migrate": "bunx drizzle-kit migrate"
     },
     "prettier": {
         "tabWidth": 4

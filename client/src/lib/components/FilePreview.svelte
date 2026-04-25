@@ -49,7 +49,7 @@
 
 	button .close {
 		color: var(--bg);
-		background-color: var(--bright);
+		background-color: rgb(from var(--fg) r g b / 0.8);
 		border-radius: 50%;
 		padding: 1px;
 		position: absolute;

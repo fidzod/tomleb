@@ -67,3 +67,20 @@ export const comments = sqliteTable("comments", {
     content: text("content"),
     createdAt: integer("created_at").notNull(),
 });
+
+export const commentLikes = sqliteTable("comment_likes", {
+    userId: integer("user_id")
+        .notNull()
+        .references(() => users.id),
+    commentId: integer("comment_id")
+        .notNull()
+        .references(() => comments.id),
+});
+
+export const commentMedia = sqliteTable("commentMedia", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    commentId: integer("comment_id")
+        .notNull()
+        .references(() => comments.id),
+    url: text("url").notNull(),
+});

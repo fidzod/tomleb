@@ -3,7 +3,15 @@ import { Hono } from "hono";
 import type { Variables } from "../types";
 
 import { db } from "../db";
-import { users, posts, postMedia, postLikes, comments } from "../db/schema";
+import {
+    users,
+    posts,
+    postMedia,
+    postLikes,
+    comments,
+    commentLikes,
+    commentMedia,
+} from "../db/schema";
 import {
     and,
     eq,
@@ -76,7 +84,10 @@ postsRoutes.get("/", optionalAuth, async (c) => {
                 and ${comments.parentId} is null
             )`,
             likeCount: sql<number>`count(${postLikes.postId})`,
-            likedByMe: sql<number>`max(case when ${postLikes.userId} = ${currentUserId} then 1 else 0 end)`,
+            likedByMe: sql<number>`max(
+                case when ${postLikes.userId} = ${currentUserId}
+                    then 1 else 0 end
+            )`,
         })
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
@@ -166,7 +177,8 @@ postsRoutes.delete("/:postId/like", requireAuth, async (c) => {
 });
 
 // Get the comments for a post with replies
-postsRoutes.get("/:postId/comments", async (c) => {
+postsRoutes.get("/:postId/comments", optionalAuth, async (c) => {
+    const currentUserId = c.get("user")?.id ?? null;
     const postId = parseInt(c.req.param("postId") as string);
 
     if (isNaN(postId)) return c.json({ message: "Post does not exist." }, 404);
@@ -215,14 +227,62 @@ postsRoutes.get("/:postId/comments", async (c) => {
         })
         .from(comments)
         .innerJoin(users, eq(comments.userId, users.id))
-        .leftJoin(replyingToUsers, eq(comments.replyingTo, replyingToUsers.id))
-        .where(and(isNotNull(comments.parentId), eq(comments.postId, postId)))
+        .leftJoin(
+            replyingToUsers,
+            eq(comments.replyingTo, replyingToUsers.id)
+        )
+        .where(and(
+            isNotNull(comments.parentId),
+            eq(comments.postId, postId)
+        ))
         .orderBy(desc(comments.createdAt));
+
+    const allCommentIds = [
+        ...topLevelComments.map((c) => c.id),
+        ...allReplies.map((c) => c.id),
+    ];
+
+    if (allCommentIds.length === 0) return c.json({ comments: [] });
+
+    const [allLikes, mediaResults] = await Promise.all([
+        db
+            .select({
+                commentId: commentLikes.commentId,
+                likeCount: sql<number>`count(*)`,
+                likedByMe: sql<number>`max(
+                    case when ${commentLikes.userId} = ${currentUserId}
+                        then 1 else 0 end
+                )`,
+            })
+            .from(commentLikes)
+            .where(inArray(commentLikes.commentId, allCommentIds))
+            .groupBy(commentLikes.commentId),
+        db
+            .select()
+            .from(commentMedia)
+            .where(inArray(commentMedia.commentId, allCommentIds)),
+    ]);
+
+    const likeMap = new Map(allLikes.map((l) => [l.commentId, l]));
+
+    const mediaMap = new Map<number, string[]>();
+    for (const m of mediaResults) {
+        if (!mediaMap.has(m.commentId)) mediaMap.set(m.commentId, []);
+        mediaMap.get(m.commentId)!.push(m.url);
+    }
 
     const map = new Map();
 
-    for (const c of [...topLevelComments, ...allReplies])
-        map.set(c.id, { ...c, replies: [] });
+    for (const c of [...topLevelComments, ...allReplies]) {
+        const likes = likeMap.get(c.id);
+        map.set(c.id, {
+            ...c,
+            likeCount: likes?.likeCount ?? 0,
+            likedByMe: Boolean(likes?.likedByMe ?? 0),
+            media: mediaMap.get(c.id) ?? [],
+            replies: [],
+        });
+    }
 
     const roots = [];
 
@@ -249,10 +309,14 @@ postsRoutes.post("/:postId/comments", requireAuth, async (c) => {
 
     const user = c.get("user");
 
-    // Using FormData to eventually support images in comments
     const body = await c.req.parseBody({ all: true });
 
     const content = body["content"] as string;
+    const files = [body["media"]]
+        .flat()
+        .filter((f) => f instanceof File)
+        .slice(0, maxUploads);
+
     const parentId = null;
     const replyingTo = null;
 
@@ -270,53 +334,19 @@ postsRoutes.post("/:postId/comments", requireAuth, async (c) => {
         })
         .returning();
 
+    for (const file of files) {
+        const ext = file.name.split(".").pop();
+        const filename = `${crypto.randomUUID()}.${ext}`;
+        const path = `uploads/${filename}`;
+        await Bun.write(path, await file.arrayBuffer());
+
+        await db.insert(commentMedia).values({
+            commentId: comment.id,
+            url: `/uploads/${filename}`,
+        });
+    }
+
     return c.json({ comment });
-});
-
-// Create a reply to a comment
-postsRoutes.post("/comments/:commentId/replies", requireAuth, async (c) => {
-    const commentId = parseInt(c.req.param("commentId"));
-    if (!commentId) return c.json({ message: "Comment does not exist." }, 404);
-
-    const comment = db
-        .select({
-            postId: comments.postId,
-            user: {
-                id: users.id,
-                username: users.username,
-            },
-        })
-        .from(comments)
-        .innerJoin(users, eq(comments.userId, users.id))
-        .where(eq(comments.id, commentId))
-        .get();
-    if (!comment) return c.json({ error: "Comment does not exist." }, 404);
-
-    const postId = comment.postId;
-    const user = c.get("user");
-    const body = await c.req.parseBody({ all: true });
-    const content = body["content"] as string;
-    const createdAt = Date.now();
-
-    const [reply] = await db
-        .insert(comments)
-        .values({
-            content,
-            postId,
-            parentId: commentId,
-            createdAt,
-            userId: user.id,
-            replyingTo: comment.user.id,
-        })
-        .returning();
-
-    return c.json({
-        ...reply,
-        replyingTo: {
-            id: comment.user.id,
-            username: comment.user.username,
-        },
-    });
 });
 
 export default postsRoutes;

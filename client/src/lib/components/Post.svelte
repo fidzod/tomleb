@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { api } from '$lib/api.ts';
+	import { api } from '$lib/api.ts';
 
 	import Gallery from '$lib/components/Gallery.svelte';
 
@@ -8,21 +8,21 @@
 
 	setLucideProps({ size: 16 });
 
-	let { post } = $props();
+	let { post, openBottom = false } = $props();
 
 	let likedByMe = $state(post.likedByMe);
 	let likeCount = $state(post.likeCount);
 
 	const likeButtonClick = async () => {
-        const res = !likedByMe
+		const res = !likedByMe
             ? await api.addLike(post.id)
             : await api.deleteLike(post.id);
-        likedByMe = res.likedByMe !== undefined ? res.likedByMe : likedByMe;
-        likeCount = res.likeCount !== undefined ? res.likeCount : likeCount;
-    };
+		likedByMe = res.likedByMe !== undefined ? res.likedByMe : likedByMe;
+		likeCount = res.likeCount !== undefined ? res.likeCount : likeCount;
+	};
 </script>
 
-<div class="post">
+<div class="post" class:openBottom>
 	<div class="row post-user">
 		<a href="/profile/{post.user.username}">
 			<img src={post.user.avatarUrl} alt="user avatar" class="avatar" />
@@ -50,20 +50,16 @@
 	</div>
 
 	<div class="post-interactions">
-		<button id="like-btn" class:liked={likedByMe} onclick={likeButtonClick}
+		<button class="like-btn" class:liked={likedByMe} onclick={likeButtonClick}
 			><HeartIcon /> {likeCount}</button
 		>
-		<button id="inter-repost"><RepeatIcon /></button>
-		<button id="inter-comments"><MessageCircleIcon /></button>
-		<button id="inter-views"><EyeIcon /></button>
+		<button class="inter-repost"><RepeatIcon /></button>
+		<a class="btn comment-btn" href="/post/{post.id}"><MessageCircleIcon /> {post.commentCount}</a>
+		<button class="inter-views"><EyeIcon /></button>
 	</div>
 </div>
 
 <style>
-	:root {
-		--like-btn-pink: #f383b7;
-	}
-
 	.post {
 		width: 100%;
 		padding: 9px 16px 16px;
@@ -73,6 +69,11 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+	}
+	.post.openBottom {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		border-bottom: none;
 	}
 	.post-user {
 		gap: 12px;
@@ -118,25 +119,6 @@
 		background: none;
 		border: none;
 		padding: 2px;
-		display: flex;
-		align-items: center;
-        box-shadow: none;
-	}
-
-	#like-btn:hover {
-		color: var(--like-btn-pink);
-	}
-
-	#like-btn.liked {
-		color: var(--like-btn-pink);
-		:global(.lucide) {
-			fill: var(--like-btn-pink);
-		}
-
-		&:hover {
-			:global(.lucide) {
-				fill: none;
-			}
-		}
+		box-shadow: none;
 	}
 </style>

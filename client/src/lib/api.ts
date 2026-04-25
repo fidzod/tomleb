@@ -1,12 +1,9 @@
 import { timeAgo } from '$lib/timeago';
-import type { Post, UserProfile } from '$lib/types';
+import type { Post, UserProfile, Comment } from '$lib/types';
 
-const BASE_URL = typeof window === 'undefined' ? 'http://localhost:3000' : '/api';
+const BASE_URL = 'http://localhost:3000';
 
-const apiCall = async (
-    path: string,
-    options: RequestInit = {}
-): Promise<Response> =>
+const apiCall = async (path: string, options: RequestInit = {}): Promise<Response> =>
     fetch(`${BASE_URL}${path}`, {
         ...options,
         credentials: 'include',
@@ -24,7 +21,7 @@ const genericUpdate = async <T extends Record<string, any>>(
     Object.entries(updates).forEach(([field, value]) => {
         formData.append(field, value);
     });
-    await apiCall(endpoint, { method: "PATCH", body: formData });
+    await apiCall(endpoint, { method: 'PATCH', body: formData });
 };
 
 export const api = {
@@ -63,17 +60,34 @@ export const api = {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         const data = await res.json();
 
-        return data.posts
-            .map((p: any) => ({
-                ...p,
-                media: p.media.map((url: string) => `${BASE_URL}${url}`),
-                timeAgo: timeAgo(p.postedAt),
-                user: {
-                    ...p.user,
-                    avatarUrl: p.user.avatarUrl ? `${BASE_URL}${p.user.avatarUrl}` : null
-                }
-            }))
-            .toSorted((a: any, b: any) => b.postedAt - a.postedAt);
+        console.log(data);
+
+        return data.posts.map((p: any) => ({
+            ...p,
+            media: p.media.map((url: string) => `${BASE_URL}${url}`),
+            timeAgo: timeAgo(p.postedAt),
+            user: {
+                ...p.user,
+                avatarUrl: p.user.avatarUrl ? `${BASE_URL}${p.user.avatarUrl}` : null
+            }
+        }));
+    },
+
+    getPost: async (postId: number): Promise<Post | null> => {
+        const res = await apiCall(`/posts?postId=${postId}`);
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+        const post = data.posts[0];
+
+        return {
+            ...post,
+            media: post.media.map((url: string) => `${BASE_URL}${url}`),
+            timeAgo: timeAgo(post.postedAt),
+            user: {
+                ...post.user,
+                avatarUrl: post.user.avatarUrl ? `${BASE_URL}${post.user.avatarUrl}` : null
+            }
+        };
     },
 
     createPost: async (content: string, media: File[]) => {
@@ -81,6 +95,44 @@ export const api = {
         formData.append('content', content);
         for (const file of media) formData.append('media', file);
         await apiCall('/posts', {
+            method: 'POST',
+            body: formData
+        });
+    },
+
+    getComments: async (postId: number): Promise<Comment[] | null> => {
+        const res = await apiCall(`/posts/${postId}/comments`);
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+        const formatComment = (c: any) => ({
+            ...c,
+            timeAgo: timeAgo(c.createdAt),
+            repliesCount: c.replies.length,
+            replies: c.replies.map(formatComment),
+            media: c.media.map((url: string) => `${BASE_URL}${url}`),
+            user: {
+                ...c.user,
+                avatarUrl: c.user.avatarUrl ? `${BASE_URL}${c.user.avatarUrl}` : null
+            }
+        });
+        return data.comments.map(formatComment);
+    },
+
+    createComment: async (postId: number, content: string, media: File[]) => {
+        const formData = new FormData();
+        formData.append('content', content);
+        for (const file of media) formData.append('media', file);
+        await apiCall(`/posts/${postId}/comments`, {
+            method: 'POST',
+            body: formData
+        });
+    },
+
+    createReply: async (parentId: number | null, content: string, media: File[]) => {
+        const formData = new FormData();
+        formData.append('content', content);
+        for (const file of media) formData.append('media', file);
+        await apiCall(`/comments/${parentId}/replies`, {
             method: 'POST',
             body: formData
         });
@@ -97,35 +149,63 @@ export const api = {
                 : null,
             bannerUrl: data.profile.bannerUrl
                 ? `${BASE_URL}${data.profile.bannerUrl}`
-                : null,
+                : null
         };
     },
 
-    updateUser: async (updates: Partial<{
-        username: string,
-        displayName: string,
-        avatar: File
-    }>) => genericUpdate('/user', updates),
+    updateUser: async (
+        updates: Partial<{
+            username: string;
+            displayName: string;
+            avatar: File;
+        }>
+    ) => genericUpdate('/user', updates),
 
-    updateProfile: async (updates: Partial<{
-        username: string,
-        displayName: string,
-        avatar: File
-    }>) => genericUpdate('/profile', updates),
+    updateProfile: async (
+        updates: Partial<{
+            username: string;
+            displayName: string;
+            avatar: File;
+        }>
+    ) => genericUpdate('/profile', updates),
 
-    addLike: async (postId: number): Promise<{
-        likeCount: number,
-        likedByMe: boolean
+    addLike: async (
+        postId: number
+    ): Promise<{
+        likeCount: number;
+        likedByMe: boolean;
     }> => {
         const res = await apiCall(`/posts/${postId}/like`, { method: 'POST' });
         return await res.json();
     },
 
-    deleteLike: async (postId: number): Promise<{
-        likeCount: number,
-        likedByMe: boolean
+    deleteLike: async (
+        postId: number
+    ): Promise<{
+        likeCount: number;
+        likedByMe: boolean;
     }> => {
         const res = await apiCall(`/posts/${postId}/like`, { method: 'DELETE' });
         return await res.json();
     },
+
+    likeComment: async (
+        commentId: number
+    ): Promise<{
+        likeCount: number;
+        likedByMe: boolean;
+    }> => {
+        const res = await apiCall(`/comments/${commentId}/like`, { method: 'POST' });
+        return await res.json();
+    },
+
+    unlikeComment: async (
+        commentId: number
+    ): Promise<{
+        likeCount: number;
+        likedByMe: boolean;
+    }> => {
+        const res = await apiCall(`/comments/${commentId}/like`, { method: 'DELETE' });
+        return await res.json();
+    }
 };

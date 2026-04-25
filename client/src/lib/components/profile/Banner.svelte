@@ -4,24 +4,21 @@
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api';
 
-    let { isOwner, bannerUrl } = $props();
+	let { isOwner, bannerUrl } = $props();
 
 	let bannerFileInput: HTMLInputElement;
 	let bannerCacheKey = $state(Date.now());
 	let updateBanner = async () => {
 		const file = bannerFileInput.files?.[0];
 		if (!file) return;
-		await api.updateProfile({banner: file});
+		await api.updateProfile({ banner: file });
 		bannerCacheKey = Date.now();
 		await invalidateAll();
 	};
 </script>
 
 {#if bannerUrl}
-	<div
-		class="banner"
-		style="background-image: url('{`${bannerUrl}?v=${bannerCacheKey}`}')"
-	></div>
+	<div class="banner" style="background-image: url('{`${bannerUrl}?v=${bannerCacheKey}`}')"></div>
 {:else}
 	<div class="banner"></div>
 {/if}
@@ -57,8 +54,8 @@
 	}
 
 	@media (max-width: 790px) {
-        .edit-banner {
-            top: 5px;
-        }
-    }
+		.edit-banner {
+			top: 5px;
+		}
+	}
 </style>

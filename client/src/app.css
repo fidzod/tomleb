@@ -7,6 +7,9 @@
 	--green: #96d0c2;
 
 	--red: #f39883;
+	
+    --comment-blue: #83a4f3;
+	--like-pink: #f383b7;
 }
 
 * {
@@ -51,12 +54,23 @@ button {
 	}
 }
 
+a.btn {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    &:active {
+        translate: 0 2px;
+    }
+}
+
 .edit-button {
-    padding: 0.5rem;
-    width: 36px;
-    height: 36px;
-    background-color: var(--bg);
-    transition: opacity 0.2s ease;
+	padding: 0.5rem;
+	width: 36px;
+	height: 36px;
+	background-color: var(--bg);
+	transition: opacity 0.2s ease;
 }
 
 button.primary {
@@ -165,4 +179,28 @@ span.highlight {
 	background-color: var(--grey);
 	border-radius: 20px;
 	padding: 0.3rem 2rem;
+}
+
+.like-btn:hover {
+    color: var(--like-pink);
+}
+
+.like-btn.liked {
+    color: var(--like-pink);
+    .lucide {
+        fill: var(--like-pink);
+    }
+
+    &:hover {
+        .lucide {
+            fill: none;
+        }
+    }
+}
+
+.comment-btn:hover {
+    color: var(--comment-blue);
+    .lucide {
+        fill: var(--comment-blue);
+    }
 }

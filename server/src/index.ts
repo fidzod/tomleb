@@ -4,6 +4,7 @@ import { serveStatic } from "hono/bun";
 
 import authRoutes from "./routes/auth.routes.ts";
 import postsRoutes from "./routes/posts.routes.ts";
+import commentsRoutes from "./routes/comments.routes.ts";
 import profileRoutes from "./routes/profile.routes.ts";
 import userRoutes from "./routes/user.routes.ts";
 
@@ -22,6 +23,7 @@ app.use("/uploads/*", serveStatic({ root: "./" }));
 
 app.route("/auth", authRoutes);
 app.route("/posts", postsRoutes);
+app.route("/comments", commentsRoutes);
 app.route("/profile", profileRoutes);
 app.route("/user", userRoutes);
 

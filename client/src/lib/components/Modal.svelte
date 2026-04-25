@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { children, closeModal } = $props();
+	let { children, closeModal } = $props();
 </script>
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && closeModal()} />
@@ -11,9 +11,9 @@
 <div class="backdrop" onclick={closeModal}>
 	<div class="modal-wrapper">
 		<div class="modal" onclick={(e) => e.stopPropagation()}>
-        {@render children()}
-        </div>
-    </div>
+			{@render children()}
+		</div>
+	</div>
 </div>
 
 <style>
@@ -41,7 +41,7 @@
 			rgb(from var(--green) r g b / 0.5),
 			rgb(from var(--yellow) r g b / 0.5)
 		);
-        backdrop-filter: blur(1px);
+		backdrop-filter: blur(1px);
 		scale: 1;
 		transition: scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -88,17 +88,17 @@
 		z-index: 2;
 	}
 
-    :global(.modal input, .modal button) {
+	:global(.modal input, .modal button) {
 		background-color: rgb(from var(--bg) r g b / 0.4);
-    }
+	}
 
-    @media (max-width: 790px) {
-        .modal {
-            background: var(--bg);
-            width: 100vw;
-            height: 100vh;
-            justify-content: center;
-            scale: 1.1;
-        }
-    }
+	@media (max-width: 790px) {
+		.modal {
+			background: var(--bg);
+			width: 100vw;
+			height: 100vh;
+			justify-content: center;
+			scale: 1.1;
+		}
+	}
 </style>

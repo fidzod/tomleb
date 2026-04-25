@@ -4,26 +4,26 @@
 
 	import { PlusIcon } from '@lucide/svelte/icons';
 
-	import NewPostForm from '$lib/components/NewPostForm.svelte';
+	import PostForm from '$lib/components/PostForm.svelte';
 	import Post from '$lib/components/Post.svelte';
 
 	onMount(() => (ui.newPostOpen = false));
 
-    let { posts, hideNewPost = false, title = null } = $props();
+	let { posts, hideNewPost = false, title = null } = $props();
 </script>
 
 <div class="row header">
 	<span>{title || 'Recent Posts'}</span>
-    {#if !hideNewPost}
-	<button class="primary post-button" onclick={() => (ui.newPostOpen = true)}>
-		<PlusIcon size={14} /> <span>New Post</span>
-	</button>
-    {/if}
+	{#if !hideNewPost}
+		<button class="primary post-button" onclick={() => (ui.newPostOpen = true)}>
+			<PlusIcon size={14} /> <span>New Post</span>
+		</button>
+	{/if}
 </div>
 
 <div class="feed">
 	{#if ui.newPostOpen}
-		<NewPostForm />
+		<PostForm />
 	{/if}
 
 	{#each posts as post}

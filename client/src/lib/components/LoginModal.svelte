@@ -52,38 +52,38 @@
 	};
 </script>
 
-<Modal closeModal={() => ui.loginModalOpen = false}>
-    <Switch
-        optionA="Log In"
-        optionB="Sign Up"
-        onSwitched={(selection: string) => {
-            switchAuthState(selection);
-        }}
-    />
-    <span>
-        {authState === 'login'
-            ? 'Welcome back.'
-            : registerState.mode === 'create-account'
-                ? 'Welcome to tomleb.'
-                : 'Create your account'}
-    </span>
-    <form onsubmit={handleSubmit}>
-        {#if registerState.mode === 'create-profile'}
-            <input type="text" placeholder="Username" bind:value={username} />
-            <input type="text" placeholder="Display Name" bind:value={displayName} />
-        {:else}
-            <input type="text" placeholder="Email" bind:value={email} />
-            <input type="password" placeholder="Password" bind:value={password} />
-        {/if}
-        {#if error}
-            <span role="alert">{error}</span>
-        {/if}
-        <button type="submit"
-            >{authState === 'login'
-                ? 'Log In'
-                : registerState.mode === 'create-account'
-                    ? 'Register'
-                    : 'Get Started'}</button
-        >
-    </form>
+<Modal closeModal={() => (ui.loginModalOpen = false)}>
+	<Switch
+		optionA="Log In"
+		optionB="Sign Up"
+		onSwitched={(selection: string) => {
+			switchAuthState(selection);
+		}}
+	/>
+	<span>
+		{authState === 'login'
+			? 'Welcome back.'
+			: registerState.mode === 'create-account'
+				? 'Welcome to tomleb.'
+				: 'Create your account'}
+	</span>
+	<form onsubmit={handleSubmit}>
+		{#if registerState.mode === 'create-profile'}
+			<input type="text" placeholder="Username" bind:value={username} />
+			<input type="text" placeholder="Display Name" bind:value={displayName} />
+		{:else}
+			<input type="text" placeholder="Email" bind:value={email} />
+			<input type="password" placeholder="Password" bind:value={password} />
+		{/if}
+		{#if error}
+			<span role="alert">{error}</span>
+		{/if}
+		<button type="submit"
+			>{authState === 'login'
+				? 'Log In'
+				: registerState.mode === 'create-account'
+					? 'Register'
+					: 'Get Started'}</button
+		>
+	</form>
 </Modal>

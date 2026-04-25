@@ -2,46 +2,29 @@
 
 ## Backlog
 ### Feature
-- [ ] (#11) Re-sharing
-- [ ] (#05) Long form posts
 - [ ] (#13) Views
-- [ ] (#14) Pagination
 - [ ] (#15) Following
+- [ ] (#14) Pagination (feeds and comments)
+- [ ] (#05) Long form posts
+- [ ] (#16) Location tagging on posts
+- [ ] (#17) Public vs. friends posts (requires: #15)
 
 ### Fix
-- [ ] (#06, #client) Mobile nav incomplete
 - [ ] (#08, #server, !) Input validation is missing everywhere (zod?)
 
 ### Refactor
 - [ ] (#07, #client) Current user is not typed
 
 ## In Progress
-- [ ] (#04) Comments
-    - UX Flow:
-        - Top level comments appear as a flat list below a post.
-        - Each comment has a comments button - this is for replies.
-        - When you click this button inline reply composer expands
-        - (anchored to that comment).
-        - Replies to a comment are shown indented once beneath it.
-        - Replies to replies do not create further nesting - they
-        - append to the same indented thread under the original comment
-        - but they are grouped and have a "replying to" label.
-    - Routes:
-        - GET /posts/?postId= A single post (for post page)
-        - GET /posts/:postId/comments Comments for a post with all replies
-        - POST /posts/:postId/comments Create a top-level comment
-        - POST /posts/comments/:commentId/replies Create a reply
-    - Sub Tasks:
-        - [x] Server
-        - Client
-            - [ ] Post page
-            - [ ] Show comments
-            - [ ] Post comment
-            - [ ] Show replies
-            - [ ] Post replies
+### Fix
+- [ ] (#06, #client, !) Mobile nav incomplete
+
+### Feature
+- [ ] (#11) Re-sharing
 
 ## Done
 ### Feature 
+- [x] (#04) Comments
 - [x] (#10) Likes
 
 ### Refactor

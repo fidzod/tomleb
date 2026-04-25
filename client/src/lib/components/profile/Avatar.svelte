@@ -5,14 +5,14 @@
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api';
 
-    let { isOwner, avatarUrl } = $props();
+	let { isOwner, avatarUrl } = $props();
 
 	let avatarFileInput: HTMLInputElement;
 	let avatarCacheKey = $state(Date.now());
 	let updateAvatar = async () => {
 		const file = avatarFileInput.files?.[0];
 		if (!file) return;
-		await api.updateUser({avatar: file});
+		await api.updateUser({ avatar: file });
 		avatarCacheKey = Date.now();
 		await invalidateAll();
 	};

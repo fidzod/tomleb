@@ -4,4 +4,4 @@
 	let { data } = $props();
 </script>
 
-<Feed posts={data.posts}/>
+<Feed posts={data.posts} />
