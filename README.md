@@ -12,7 +12,7 @@ A full-stack social platform built with modern web technologies.
 
 - Authentication (register, login, logout)
 - Posts with image uploads and likes
-- Comments and threaded replies (*WIP*)
+- Comments and threaded replies
 - User profiles
 
 ## Running locally
